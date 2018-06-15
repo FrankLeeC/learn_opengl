@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glad/glad.h>
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
 
 int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
     __FILE * fp = NULL;
@@ -84,19 +81,73 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
     return 0;
 }
 
-int get_program(char* filename, GLenum type, GLuint* program) {
+int get_program(char* filename, GLenum type, GLuint* my_program) {
     GLuint shader = glCreateShader(type);
     if (!shader) {
         return -1;  // create shader error
     }
+
     int count = 0;
     char** lines;
     int* length;
     int r = read_file(filename, &lines, &count, &length);
     if (r != 0) {
+        for (int i = 0; i < count; i++) {
+            free(lines);
+        }
+        free(lines);
+        free(length);
         return -2;  // read file error
     }
 
+    glShaderSource(shader, count, lines, length);
+
+    for (int i = 0; i < count; i++) {
+        free(lines);
+    }
+    free(lines);
+    free(length);
+ 
+    glCompileShader(shader);
+    GLint compiled;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);  // 获取shader的信息，第二个参数指定需要什么信息，第三个值返回信息的值
+    if (!compiled) {
+        GLint len;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+        GLchar* log_info = (char*)malloc(len*sizeof(char));
+        glGetShaderInfoLog(shader, len, &len, log_info);
+        printf("failed to compile shader: %s\n", log_info);
+        free(log_info);
+
+        glDeleteShader(shader);
+        return -3;  // compile shader error
+    }
+
+    GLuint program = glCreateProgram();
+    if (!program) {
+        glDeleteShader(shader);
+        return -4; // create program error
+    }
+
+    glAttachShader(program, shader);
+    glLinkProgram(program);
+
+    int linked;
+    glGetProgramiv(program, GL_LINK_STATUS, &linked);
+    if (!linked) {
+        int len;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        char* log_info = (char*)malloc(len*sizeof(char));
+        glGetProgramInfoLog(program, len, &len, log_info);
+        printf("link program error: %s\n", log_info);
+        free(log_info);
+        glDetachShader(program, shader);
+        glDeleteShader(shader);
+        glDeleteProgram(program);
+        return -5; // link program error
+    }
+
+    *my_program = program;
     return 0;
 }
 
