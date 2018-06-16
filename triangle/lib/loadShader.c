@@ -1,7 +1,8 @@
-#define _GNU_SOURCE
+// #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <glad/glad.h>
+// #include <mycommon/loadShader.h>
 
 int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
     __FILE * fp = NULL;
@@ -28,7 +29,7 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
         char * line = NULL;
         if((read = getline(&line, &len, fp)) != -1) {
             // printf("Retrieved line of length %zu/%d :%s", read, len, line);
-            line[read] = NULL;
+            line[read] = '\0';
             lines[i] = line;
             length[i] = read;
             i++;
@@ -81,7 +82,7 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
     return 0;
 }
 
-int get_program(char* filename, GLenum type, GLuint* my_program) {
+int get_shader(char* filename, GLenum type, GLuint* my_shader) {
     GLuint shader = glCreateShader(type);
     if (!shader) {
         return -1;  // create shader error
@@ -93,7 +94,7 @@ int get_program(char* filename, GLenum type, GLuint* my_program) {
     int r = read_file(filename, &lines, &count, &length);
     if (r != 0) {
         for (int i = 0; i < count; i++) {
-            free(lines);
+            free(lines[i]);
         }
         free(lines);
         free(length);
@@ -103,7 +104,7 @@ int get_program(char* filename, GLenum type, GLuint* my_program) {
     glShaderSource(shader, count, lines, length);
 
     for (int i = 0; i < count; i++) {
-        free(lines);
+        free(lines[i]);
     }
     free(lines);
     free(length);
@@ -122,14 +123,23 @@ int get_program(char* filename, GLenum type, GLuint* my_program) {
         glDeleteShader(shader);
         return -3;  // compile shader error
     }
+    *my_shader = shader;
+    return 0;
+}
 
+int get_program(int count, GLuint* shaders, GLuint* my_program) {
     GLuint program = glCreateProgram();
     if (!program) {
-        glDeleteShader(shader);
-        return -4; // create program error
+        return -1; // create program error
     }
 
-    glAttachShader(program, shader);
+    for (int i = 0; i < count; i++) {
+        if (glIsShader(shaders[i])) {
+            glAttachShader(program, shaders[i]);
+        } else {
+            return -3;
+        }
+    }
     glLinkProgram(program);
 
     int linked;
@@ -141,13 +151,16 @@ int get_program(char* filename, GLenum type, GLuint* my_program) {
         glGetProgramInfoLog(program, len, &len, log_info);
         printf("link program error: %s\n", log_info);
         free(log_info);
-        glDetachShader(program, shader);
-        glDeleteShader(shader);
+        for (int i = 0; i < count; i++) {
+            glDetachShader(program, shaders[i]);
+        }
         glDeleteProgram(program);
-        return -5; // link program error
+        return -2; // link program error
     }
 
     *my_program = program;
     return 0;
 }
 
+// gcc -o ./loadShader.o -c ./loadShader.c
+// gcc -shared -fPIC -o libshader.so -L. -lglad ./loadShader.o
