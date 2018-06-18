@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
     // 第六个参数表示起始数据在数组中的偏移
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // 
+    // 启用顶点数组对象
+    // 参数index与glVertextAttribPointer第一个参数index保持一致
     glEnableVertexAttribArray(0);
 
     while(!glfwWindowShouldClose(window)) {
