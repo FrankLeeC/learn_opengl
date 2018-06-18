@@ -63,12 +63,28 @@ int main(int argc, char** argv) {
     };
 
     GLuint vbo, vao;
+
+    // 创建并绑定顶点对象，后续操作都会对这个对象起作用
     glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
     glBindVertexArray(vao);
+
+    // 创建并绑定缓存
+    glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // 传输缓存数据
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+
+    // 设置顶点属性
+    // 第一个参数表示vert中layout值对应的顶点
+    // 第二个参数表示每个点的数据个数 1/2/3/4
+    // 第三个参数表示顶点数据类型
+    // 第四个参数表示是否归一化，FALSE表示不归一化。直接将整型转为浮点型
+    // 第五个参数表示每两个连续元素之间的偏移字节数
+    // 第六个参数表示起始数据在数组中的偏移
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // 
     glEnableVertexAttribArray(0);
 
     while(!glfwWindowShouldClose(window)) {
