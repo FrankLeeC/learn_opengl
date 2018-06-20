@@ -75,11 +75,11 @@ int main(int argc, char **argv) {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
         -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f
     };
-    GLuint vbo, vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    GLuint vbo[2], vao[2];
+    glGenVertexArrays(2, &vao[0]);
+    glBindVertexArray(vao[0]);
+    glGenBuffers(2, &vbo[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -91,11 +91,8 @@ int main(int argc, char **argv) {
         0.5f, 0.5f, 0.0f,
         -0.3f, 0.5f, 0.0f
     };
-    GLuint vao2, vbo2;
-    glGenVertexArrays(1, &vao2);
-    glBindVertexArray(vao2);
-    glGenBuffers(1, &vbo2);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    glBindVertexArray(vao[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
@@ -105,12 +102,12 @@ int main(int argc, char **argv) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // 渲染第一个
-        glBindVertexArray(vao);
+        glBindVertexArray(vao[0]);
         glUseProgram(program);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // 渲染第二个
-        glBindVertexArray(vao2);
+        glBindVertexArray(vao[1]);
         glUseProgram(program2);
         GLuint color = glGetUniformLocation(program2, "my_color");
         glUniform4f(color, 0.0f, 1.0f, 0.0f, 1.0f);
@@ -121,11 +118,8 @@ int main(int argc, char **argv) {
 
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-
-    glDeleteVertexArrays(1, &vao2);
-    glDeleteBuffers(1, &vbo2);
+    glDeleteVertexArrays(2, &vao);
+    glDeleteBuffers(2, &vbo);
 
     glfwTerminate();
     return 0;
