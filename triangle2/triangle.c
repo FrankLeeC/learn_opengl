@@ -3,7 +3,7 @@
 #include <mycommon/loadShader.h>
 #include <stdio.h>
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     int init = glfwInit();
     if (!init) {
         printf("glfw init error\n");
@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     glfwWindowHint(GL_MAJOR_VERSION, 4);
     glfwWindowHint(GL_MINOR_VERSION, 6);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Triangle", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(800, 600, "Triangle", NULL, NULL);
     if (NULL == window) {
         printf("failed to create window\n");
         glfwTerminate();
@@ -29,20 +29,20 @@ int main(int argc, char** argv) {
 
     GLuint vshader, fshader;
     // 创建 vertext shader
-    int a = get_shader("./source/shader/triangle1.vert", GL_VERTEX_SHADER, &vshader);
+    int a = get_shader("./source/shader/triangle.vert", GL_VERTEX_SHADER, &vshader);
     if (a != 0) {
         printf("failed to create vertex shader: %d\n", a);
         return 1;
     }
     
     // 创建 fragment shader
-    a = get_shader("./source/shader/triangle1.frag", GL_FRAGMENT_SHADER, &fshader);
+    a = get_shader("./source/shader/triangle.frag", GL_FRAGMENT_SHADER, &fshader);
     if (a != 0) {
         printf("failed to create fragment shader: %d\n", a);
         return 1;
     }
 
-    GLuint* shaders = (GLuint*)malloc(2*sizeof(GLuint));
+    GLuint *shaders = (GLuint*)malloc(2*sizeof(GLuint));
     shaders[0] = vshader;
     shaders[1] = fshader;
     GLuint program;
@@ -57,9 +57,9 @@ int main(int argc, char** argv) {
 
     // 坐标
     float vertices[] = {
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     GLuint vbo, vao;
@@ -82,11 +82,14 @@ int main(int argc, char** argv) {
     // 第四个参数表示是否归一化，FALSE表示不归一化。直接将整型转为浮点型
     // 第五个参数表示每两个连续元素之间的偏移字节数
     // 第六个参数表示起始数据在数组中的偏移
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
 
     // 启用顶点数组对象
     // 参数index与glVertextAttribPointer第一个参数index保持一致
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 3*sizeof(float));;
+    glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -94,13 +97,14 @@ int main(int argc, char** argv) {
 
         glUseProgram(program);
 
-        // 更新 uniform 
-        float timev = glfwGetTime();
-        float green = sin(timev) / 2.0f + 0.5f;
-        GLint vcolor = glGetUniformLocation(program, "my_color");
-        glUniform4f(vcolor, 0.0f, green, 0.0f, 1.0f);
+        // // 更新 uniform 
+        // float timev = glfwGetTime();
+        // float green = sin(timev) / 2.0f + 0.5f;
+        // GLint vcolor = glGetUniformLocation(program, "ourColor");
+        // glUniform4f(vcolor, 0.0f, green, 0.0f, 1.0f);
 
         // 渲染
+        glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
@@ -115,5 +119,3 @@ int main(int argc, char** argv) {
     return 0;
     
 }
-
-// gcc ./triangle1.c -lopengl32 -l:libglad.so -lglfw3dll -l:libshader.so
