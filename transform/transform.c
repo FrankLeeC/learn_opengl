@@ -3,10 +3,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <mycommon/loadShader.h>
-// #include <cglm/cglm.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <cglm/cglm.h>
+// #include <glm/glm.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
+// #include <glm/gtc/type_ptr.hpp>
 #include <stdio.h>
 
 void processInput(GLFWwindow *window);
@@ -132,6 +132,9 @@ int main(int argc, char** argv) {
     glUniform1i(glGetUniformLocation(program, "texture1"), 0);
     glUniform1i(glGetUniformLocation(program, "texture2"), 1);
 
+    mat4 transform;
+    vec3 v = {0.5f, -0.5f, 0.0f};
+    vec3 v2 = {0.0f, 0.0f, 1.0f};
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -142,12 +145,21 @@ int main(int argc, char** argv) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        glm::mat4 transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // glm::mat4 transform = glm::mat4(1.0f);
+        // transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        // transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
+        // unsigned int transformLoc = glGetUniformLocation(program, "transform");
+        // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+
+        
+        glm_mat4_identity(&transform);
+        glm_translate(&transform, &v);
+        glm_rotate(&transform, (float)glfwGetTime(), &v2);
         unsigned int transformLoc = glGetUniformLocation(program, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform[0]);
+
         glUniform1f(glGetUniformLocation(program, "mixValue"), mixValue);
 
         glUseProgram(program);
