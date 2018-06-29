@@ -129,9 +129,9 @@ int main(int argc, char** argv) {
     glUniform1i(glGetUniformLocation(program, "texture1"), 0);
     glUniform1i(glGetUniformLocation(program, "texture2"), 1);
 
-    mat4 transform;
-    vec3 v = {0.5f, -0.5f, 0.0f};
-    vec3 v2 = {0.0f, 0.0f, 1.0f};
+    mat4 model, view, projection;
+    vec3 v = {1.0f, 0.0f, 0.0f};
+    vec3 v2 = {0.0f, 0.0f, -3.0f};
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -142,11 +142,20 @@ int main(int argc, char** argv) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
       
-        glm_mat4_identity(&transform);
-        glm_translate(&transform, &v);
-        glm_rotate(&transform, (float)glfwGetTime(), &v2);
-        unsigned int transformLoc = glGetUniformLocation(program, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform[0]);
+        glm_mat4_identity(&model);
+        glm_rotate(&model, glm_rad(-55.0f), &v);
+        unsigned int modelLoc = glGetUniformLocation(program, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0]);
+        
+        glm_mat4_identity(&view);
+        glm_translate(&view, &v2);
+        unsigned int viewLoc = glGetUniformLocation(program, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0]);
+
+        glm_mat4_identity(&projection);
+        glm_perspective(glm_rad(45.0f), (float)800 / (float)600, 0.1f, 100.0f, &projection);
+        unsigned int projectionLoc = glGetUniformLocation(program, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0]);
 
         glUniform1f(glGetUniformLocation(program, "mixValue"), mixValue);
 
