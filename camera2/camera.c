@@ -8,7 +8,13 @@
 
 void processInput(GLFWwindow *window);
 
+float last_time = 0.0f;
+float delta = 0.0f;
 float mixValue = 0.2f;
+float speed = 0.5f;
+vec3 camera_pos = {0.0f, 0.0f, 3.0f};
+vec3 camera_front = {0.0f, 0.0f, -1.0f};
+vec3 camera_up = {0.0f, 1.0f, 0.0f};
 
 int main(int argc, char** argv) {
     int init = glfwInit();
@@ -173,7 +179,8 @@ int main(int argc, char** argv) {
 
     mat4 view, projection;
     vec3 v = {1.0f, 0.3f, 0.5f};
-    vec3 v2 = {0.0f, 0.0f, -3.0f};
+    vec3 center;
+    vec3 up = {0.0f, 0.8f, 0.0f};
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -185,7 +192,8 @@ int main(int argc, char** argv) {
         glBindTexture(GL_TEXTURE_2D, texture2);
             
         glm_mat4_identity(&view);
-        glm_translate(&view, &v2);
+        glm_vec_add(camera_front, camera_pos, &center);
+        glm_lookat(&camera_pos, &center, &up, &view);
         unsigned int viewLoc = glGetUniformLocation(program, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0]);
 
@@ -218,23 +226,38 @@ int main(int argc, char** argv) {
 
     glfwTerminate();
     return 0;
-    
 }
 
 void processInput(GLFWwindow *window) {
+    float c = glfwGetTime();
+    delta = c - last_time;
+    last_time = c;
+    float c_speed = delta * speed;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, 1);
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        mixValue += 0.001f;
-        if (mixValue >= 1.0f) {
-            mixValue = 1.0f;
-        }
+        vec3 camera_front_move;
+        glm_vec_scale(&camera_front, c_speed, &camera_front_move);
+        glm_vec_add(&camera_pos, &camera_front_move, &camera_pos);
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        mixValue -= 0.001f;
-        if (mixValue <= 0.0f) {
-            mixValue = 0.0f;
-        }
+        vec3 camera_front_move;
+        glm_vec_scale(&camera_front, -c_speed, &camera_front_move);
+        glm_vec_add(&camera_pos, &camera_front_move, &camera_pos);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        vec3 right;
+        glm_cross(camera_up, camera_front, &right);
+        glm_normalize(&right);
+        glm_vec_scale(&right, c_speed, &right);
+        glm_vec_add(&camera_pos, &right, &camera_pos);
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        vec3 right;
+        glm_cross(camera_up, camera_front, &right);
+        glm_normalize(&right);
+        glm_vec_scale(&right, -c_speed, &right);
+        glm_vec_add(&camera_pos, &right, &camera_pos);
     }
 }

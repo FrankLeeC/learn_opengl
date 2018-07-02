@@ -173,7 +173,8 @@ int main(int argc, char** argv) {
 
     mat4 view, projection;
     vec3 v = {1.0f, 0.3f, 0.5f};
-    vec3 v2 = {0.0f, 0.0f, -3.0f};
+    vec3 center = {0.2f, 0.8f, 0.0f};
+    vec3 up = {0.0f, 0.8f, 0.0f};
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -185,7 +186,11 @@ int main(int argc, char** argv) {
         glBindTexture(GL_TEXTURE_2D, texture2);
             
         glm_mat4_identity(&view);
-        glm_translate(&view, &v2);
+        float radius = 30.0f;
+        float x = sin(glfwGetTime())*radius;
+        float z = cos(glfwGetTime())*radius;
+        vec3 eye = {x, x+z, z};
+        glm_lookat(&eye, &center, &up, &view);
         unsigned int viewLoc = glGetUniformLocation(program, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0]);
 
@@ -218,7 +223,7 @@ int main(int argc, char** argv) {
 
     glfwTerminate();
     return 0;
-    
+   
 }
 
 void processInput(GLFWwindow *window) {
