@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     vec3 light_position = {1.2f, 1.0f, 2.0f};
     vec3 center;
     vec3 up = {0.0f, 1.0f, 0.0f};
-    float scale = 0.2f;
+    vec3 scale = {0.2f, 0.2f, 0.2f};
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
         glfwSetCursorPosCallback(window, processCursor);
