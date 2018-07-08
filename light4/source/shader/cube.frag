@@ -17,7 +17,7 @@ void main() {
     float factor = max(dot(n,l), 0.0);
     vec3 diffuse = factor * light;
 
-    vec3 ref = reflect(frag_position - light, n);
+    vec3 ref = reflect(-l, n);
     vec3 v = normalize(view_position - frag_position);
     float spec = pow(max(dot(ref, v), 0.0), 32);
     vec3 specular = 0.5 * spec * light;

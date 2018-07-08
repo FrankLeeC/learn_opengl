@@ -1,4 +1,4 @@
-rectangle: shader.so
+target: shader.so
 	gcc ./texture.c -L./lib/ -lopengl32 -l:libglad.so -lglfw3dll -l:libshader.so
 
 shader.so: libglad.so
