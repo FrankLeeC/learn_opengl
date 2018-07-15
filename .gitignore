@@ -1,4 +1,5 @@
 .vscode/*
+test/*
 *.so
 *.dll
 *.exe

@@ -1,11 +1,11 @@
 CC=gcc
-target: shader.so
-	$(CC) ./transform.c -L./lib/ -lopengl32 -l:libglad.so -lglfw3dll -l:libshader.so
+target: shader.dll
+	$(CC) ./transform.c -L./lib/ -lopengl32 -l:libglad.so -lglfw3dll -l:libshader.dll
 
-shader.so: libglad.so
+shader.dll: libglad.so
 	$(CC) -o ./lib/loadShader.o -c ./lib/loadShader.c
-	$(CC) -shared -fPIC -o ./lib/libshader.so -L. -l:libglad.so ./lib/loadShader.o
-	cp ./lib/libshader.so ./libshader.so
+	$(CC) -shared -fPIC -o ./lib/libshader.dll -L. -l:libglad.so ./lib/loadShader.o
+	cp ./lib/libshader.dll ./libshader.dll
 
 libglad.so: ./lib/glad.c
 	$(CC) -c ./lib/glad.c -o ./lib/glad.o
