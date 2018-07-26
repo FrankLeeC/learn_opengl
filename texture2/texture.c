@@ -54,10 +54,17 @@ int main(int argc, char** argv) {
     }
 
     float vertices[] = {
-        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f,  // 右上角
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f,  // 右下角
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,// 左下角
-        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 2.0f   // 左上角
+        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // 右上角
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // 右下角
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,// 左下角
+        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f   // 左上角
+    };
+
+    float textures[] = {
+        2.0f, 2.0f,
+        2.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 2.0f
     };
 
     unsigned int indices[] = {
@@ -65,7 +72,7 @@ int main(int argc, char** argv) {
         1, 2, 3
     };
 
-    GLuint vbo, vao, ibo;
+    GLuint vbo, tbo, vao, ibo;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glGenBuffers(1, &ibo);
@@ -74,9 +81,12 @@ int main(int argc, char** argv) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), 3*sizeof(float));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), 6*sizeof(float));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 3*sizeof(float));
+    glGenBuffers(1, &tbo);
+    glBindBuffer(GL_ARRAY_BUFFER, tbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(textures), textures, GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
