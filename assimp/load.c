@@ -4,13 +4,18 @@
 #include <mycommon/strutil.h>
 
 
-int is_comment_or_empty(char* str) {
-    if (str == NULL) {
+int is_comment_or_empty(char* str) 
+{
+    if (str == NULL) 
+    {
         return 1;
     }
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] != '\t' && str[i] != ' ') {
-            if (str[i] == '#') {
+    for (int i = 0; str[i] != '\0'; i++) 
+    {
+        if (str[i] != '\t' && str[i] != ' ') 
+        {
+            if (str[i] == '#') 
+            {
                 return 1;
             }
             return 0;
@@ -22,7 +27,8 @@ int is_comment_or_empty(char* str) {
 /**
  * read file line by line
  */
-int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
+int read_file(char* file_name, char*** my_lines, int* count, int** my_length) 
+{
     FILE * fp = NULL;
     int n = 2;
     int m = 2;
@@ -32,8 +38,10 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
     int read;
 
     fp = fopen(file_name, "r");
-    if (fp == NULL) {
-        for(int i = 0; i < n; i++) {
+    if (fp == NULL) 
+    {
+        for(int i = 0; i < n; i++) 
+        {
             free(lines[i]);
         }
         free(lines);
@@ -43,20 +51,27 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
         return -2;
     }
     int i = 0;
-    while (1) {
+    while (1) 
+    {
         char * line = NULL;
-        if((read = getline(&line, &len, fp)) != -1 && !is_comment_or_empty(line)) {
+        if((read = getline(&line, &len, fp)) != -1 && !is_comment_or_empty(line)) 
+        {
             line[read] = '\0';
             lines[i] = line;
             length[i] = read;
             i++;
-            if (i >= n) {
+            if (i >= n) 
+            {
                 char** tmp = (char**)realloc(lines, n*2*sizeof(char*));
-                if (tmp) {
+                if (tmp) 
+                {
                     lines = tmp;
                     n *= 2;
-                } else {
-                    for(int i = 0; i < n; i++) {
+                }
+                else 
+                {
+                    for(int i = 0; i < n; i++) 
+                    {
                         free(lines[i]);
                     }
                     free(lines);
@@ -65,26 +80,34 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
                 }
                 tmp = NULL;
             }
-            if (i >= m) {
+            if (i >= m) 
+            {
                 int* tmp = (int*)realloc(length, m*2*sizeof(int));
-                if (tmp) {
+                if (tmp) 
+                {
                     length = tmp;
                     m *= 2;
-                } else {
+                }
+                else
+                {
                     free(length);
                     length = NULL;
                     return -3;
                 }
                 tmp = NULL;
             }
-        } else {
+        }
+        else 
+        {
             break;
         }
     }
     *count = i;
     int r = fclose(fp);
-    if (r) {
-        for(int i = 0; i < n; i++) {
+    if (r) 
+    {
+        for(int i = 0; i < n; i++) 
+        {
             free(lines[i]);
         }
         free(lines);
@@ -101,7 +124,8 @@ int read_file(char* file_name, char*** my_lines, int* count, int** my_length) {
 
 
 
-int main() {
+int main() 
+{
     char* s = "";
     printf("%d\n", is_comment_or_empty(s));
     s = NULL;

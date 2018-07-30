@@ -57,16 +57,43 @@ void trim_to(char **out, char *in) {
     memcpy(*out, begin, (end-begin+1)*sizeof(char));
 }
 
-void split(char ***out, char *in, char sep, int *count) {
+
+void split(char ***out, char *in, char* sep, int *count) {
     int a = 0, b = 1 << 1;
+    int sep_len = strlen(sep);
     int *indices = (int*)malloc(b*sizeof(int));
     int len = strlen(in);
     if (len == 0) {
         *count = 0;
         return;
     }
+    if (sep_len > len) {  // 分隔符长度大于输入字符长度
+        *count = 0;
+        return;
+    }
+    if (sep_len == 0) {
+        *count = 1;
+        char** my_out = (char**)malloc(1*sizeof(char*));
+        char* tmp = (char*) malloc(len*sizeof(char));
+        memcpy(tmp, in, len);
+        my_out[0] = tmp;
+        *out = my_out;
+        return;
+    }
+
     for (int i = 0; i < len; i++) {
-        if (in[i] == sep) {
+        int match = 1;
+        if (in[i] == sep[0]) {
+            for (int j = 1; j < sep_len; j++) {
+                if (in[i+j] != sep[j]) {
+                    match = 0;
+                    break;
+                }
+            }
+            if (!match) {
+                continue;
+            }
+
             if (a >= b - 1) {
                 b <<= 1;
                 int *tmp = (int*)realloc(indices, b*sizeof(int));
@@ -75,6 +102,8 @@ void split(char ***out, char *in, char sep, int *count) {
                 }
             }
             indices[a++] = i;
+
+            i += sep_len - 1;
         }
     }
     if (a == 0) {
@@ -96,8 +125,8 @@ void split(char ***out, char *in, char sep, int *count) {
             begin = in;
             size = indices[i] * sizeof(char);
         } else {
-            begin = in + indices[i-1] + 1;
-            size = (indices[i] - indices[i-1] - 1) * sizeof(char);
+            begin = in + indices[i-1] + sep_len;
+            size = (indices[i] - indices[i-1] - sep_len) * sizeof(char);
         }
         char *tmp = (char*)malloc((size+1)*sizeof(char));
         memcpy(tmp, begin, size);
@@ -107,7 +136,8 @@ void split(char ***out, char *in, char sep, int *count) {
     if (indices[a-1] < len - 1) {
         int size = len - 1 - indices[a - 1];
         char *tmp = (char*)malloc((size+1)*sizeof(char));
-        memcpy(tmp, in + indices[a - 1] + 1, size);
+        memcpy(tmp, in + indices[a - 1] + sep_len, size);
+        tmp[size] = '\0';
         my_out[a] = tmp;
     } else {
         char *tmp = (char*)malloc(1);
