@@ -42,11 +42,23 @@ Texture* new_texture(unsigned int id, char* type);
 
 typedef struct Mesh 
 {
-    Vertex* vertices;  // 顶点数组
+    Vertex** vertices;  // 顶点数组
     unsigned int v_count;  // 顶点个数
     unsigned int* indices;  // 顺序数组
     unsigned int idx_count;  // 顺序个数
-    Texture* Textures;  // 纹理数组
+    Texture** Textures;  // 纹理数组
     unsigned int t_count;  // 纹理个数
 } Mesh;
+
+/**
+ * 创建一个 Mesh
+ * 初始化的顶点个数，顺序个数，纹理个数都是 0
+ */ 
+Mesh* new_mesh();
+
+void add_vertex(Vertex* v);
+
+void add_index(unsigned int idx);
+
+void add_texture(Texture* t);
 #endif
